@@ -36,3 +36,12 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .merr{background:#3B1212;color:#FECACA;border-color:#7F1D1D}:root:not([data-theme="light"]) .mf small.ok{color:#4ADE80}:root:not([data-theme="light"]) .mf small.bad{color:#F87171}}
 :root[data-theme="dark"] .merr{background:#3B1212;color:#FECACA;border-color:#7F1D1D}
 :root[data-theme="dark"] .mf small.ok{color:#4ADE80}:root[data-theme="dark"] .mf small.bad{color:#F87171}
+.nudge{display:flex;gap:16px;align-items:flex-start;border-color:color-mix(in srgb,var(--accent) 35%,var(--line));background:color-mix(in srgb,var(--accent) 5%,var(--surface))}
+.nudge .nic{width:42px;height:42px;border-radius:11px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;flex:none}
+.nudge .nic svg{width:22px;height:22px}
+.nudge .ntx{flex:1;min-width:0}
+.nudge h2{margin:0 0 4px;font-size:18px}
+.nudge p{margin:0 0 14px;color:var(--muted);font-size:14.5px;line-height:1.5;max-width:60ch}
+.nudge .nact{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.nudge .nlater{background:none;border:0;font:inherit;font-size:14px;color:var(--muted);cursor:pointer;padding:8px 6px;text-decoration:underline;text-underline-offset:3px}
+@media (max-width:520px){.nudge{flex-direction:column;gap:12px}.nudge .nact .btn{flex:1 1 0;justify-content:center;white-space:nowrap;padding-inline:10px}.nudge .nlater{width:100%;text-align:center}}

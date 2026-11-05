@@ -99,9 +99,33 @@ function paint(){
   }
   var sp=document.querySelector('#sprog span');if(sp)sp.textContent=label();
 }
+/* convite no Início: aparece para quem não tem conta; some ao entrar.
+   "Agora não" esconde; ele volta uma única vez depois de mais 5 atividades. */
+var NKEY='ga2av-nudge';
+function getN(){try{return JSON.parse(localStorage.getItem(NKEY)||'null')||{n:0,at:0};}catch(e){return {n:0,at:0};}}
+function setN(o){try{localStorage.setItem(NKEY,JSON.stringify(o));}catch(e){}}
+function count(S){var n=0;if(S.done)n+=Object.keys(S.done).length;if(S.cards)n+=Object.keys(S.cards).length;if(S.train)for(var k in S.train)n+=(+S.train[k]||0);return n;}
+function nudge(pg){
+  var S=GA.S(),c=count(S),N=getN();
+  if(!(N.n===0||(N.n===1&&c>=N.at+5)))return;
+  var again=N.n===1;
+  var box=document.createElement('div');box.className='card nudge';
+  box.innerHTML='<div class="nic">'+svg('cloud')+'</div><div class="ntx"><h2>'+(again?'Você já fez '+c+' atividades':'Guarde seu progresso')+'</h2><p>'+
+    (again?'Crie sua conta para não perder nada se trocar de aparelho ou limpar o navegador. Leva 10 segundos.':'Crie uma conta com usuário e PIN de 4 números e continue de onde parou no celular ou no computador. Sem e-mail.')+
+    '</p><div class="nact"><button class="btn pri" type="button" data-a="new">Criar conta</button><button class="btn" type="button" data-a="in">Já tenho conta</button><button class="nlater" type="button" data-a="later">Agora não</button></div></div>';
+  box.querySelector('[data-a=new]').onclick=function(){openM('new');};
+  box.querySelector('[data-a=in]').onclick=function(){openM('in');};
+  box.querySelector('[data-a=later]').onclick=function(){setN({n:N.n+1,at:c});box.remove();GA.toast('Tudo bem. Você pode criar a conta quando quiser, pelo botão '+(innerWidth<960?'de perfil no topo':'no canto da barra lateral')+'.','', 'ok');};
+  var hero=pg.querySelector('.hero'),ph=pg.querySelector('.phead');
+  if(c===0&&!S.diag&&ph)ph.insertAdjacentElement('afterend',box);
+  else if(hero)hero.insertAdjacentElement('afterend',box);
+  else pg.appendChild(box);
+}
 function after(pg){
   paint();
-  if(A&&window.GA&&GA.S().tab==='mapa'){var e=pg.querySelector('.phead .eyebrow');if(e)e.textContent='Olá, '+first(A.name);}
+  if(!window.GA||GA.S().tab!=='mapa')return;
+  if(A){var e=pg.querySelector('.phead .eyebrow');if(e)e.textContent='Olá, '+first(A.name);}
+  else nudge(pg);
 }
 function logout(){
   if(!A)return;var a=A;
@@ -161,6 +185,6 @@ window.GASync={dirty:dirty,after:after,label:label};
 window.addEventListener('online',function(){if(A&&A.pending)push(false);});
 document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden'&&A&&A.pending){clearTimeout(timer);push(true);}else if(document.visibilityState==='visible'&&A)pull();});
 setInterval(function(){if(A&&A.pending&&status==='off')push(false);},30000);
-function boot(){if(!window.GA)return setTimeout(boot,50);paint();if(A)pull();}
+function boot(){if(!window.GA)return setTimeout(boot,50);var pg=document.getElementById('page');if(pg)after(pg);else paint();if(A)pull();}
 boot();
 })();
